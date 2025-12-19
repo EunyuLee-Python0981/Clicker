@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Clicker Game</title>
+
+<style>
+body {
+  background: #f2f2f2;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.app {
+  background: white;
+  width: 360px;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  text-align: center;
+}
+
+.coins {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.gems {
+  margin-bottom: 10px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin: 6px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  background: #4c6ef5;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.shop {
+  margin-top: 14px;
+  text-align: left;
+}
+
+.shop h2 {
+  text-align: center;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.item button {
+  width: auto;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.hidden {
+  display: none;
+}
+
+.ending {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <h1>Clicker Game</h1>
+
+  <div class="coins" id="coins">0</div>
+  <div class="gems" id="gems">💎 0</div>
+
+  <button id="clickBtn">CLICK</button>
+
+  <div class="shop">
+    <h2>🪙 Coin Shop</h2>
+    <div id="coinShop"></div>
+  </div>
+
+  <div class="shop">
+    <h2>💎 Gem Shop</h2>
+    <div id="gemShop"></div>
+  </div>
+
+  <div class="ending hidden" id="ending">
+    플레이 해주셔서 감사합니다.
+  </div>
+</div>
+
+<script>
+let coins = 0;
+let gems = 0;
+let clickPower = 1;
+
+const coinsEl = document.getElementById("coins");
+const gemsEl = document.getElementById("gems");
+const clickBtn = document.getElementById("clickBtn");
+const coinShopEl = document.getElementById("coinShop");
+const gemShopEl = document.getElementById("gemShop");
+const endingEl = document.getElementById("ending");
+
+const coinShop = [
+  { cost: 10, power: 2 },
+  { cost: 50, power: 5 },
+  { cost: 100, power: 8 },
+  { cost: 175, power: 10 },
+  { cost: 500, power: 15 },
+  { cost: 1000, power: 20 },
+  { cost: 10000, power: 50 },
+  { cost: 15000, power: 250 },
+  { cost: 20000, power: 1000 },
+  { cost: 100000, ending: true }
+];
+
+const gemShop = [
+  { cost: 50, power: 50 },
+  { cost: 100, power: 60 },
+  { cost: 200, power: 70 },
+  { cost: 400, power: 100 }
+];
+
+function updateUI() {
+  coinsEl.textContent = coins;
+  gemsEl.textContent = "💎 " + gems;
+}
+
+function createShop() {
+  coinShop.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "item";
+
+    const text = document.createElement("span");
+    text.textContent = item.ending ? "엔딩" : "클릭당 +" + item.power;
+
+    const btn = document.createElement("button");
+    btn.textContent = item.cost;
+
+    btn.onclick = () => {
+      if (coins < item.cost) return;
+      coins -= item.cost;
+
+      if (item.ending) {
+        endingEl.classList.remove("hidden");
+        clickBtn.disabled = true;
+      } else {
+        clickPower = item.power;
+      }
+      updateUI();
+    };
+
+    div.append(text, btn);
+    coinShopEl.appendChild(div);
+  });
+
+  gemShop.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "item";
+
+    const text = document.createElement("span");
+    text.textContent = "클릭당 +" + item.power;
+
+    const btn = document.createElement("button");
+    btn.textContent = item.cost;
+
+    btn.onclick = () => {
+      if (gems < item.cost) return;
+      gems -= item.cost;
+      clickPower = item.power;
+      updateUI();
+    };
+
+    div.append(text, btn);
+    gemShopEl.appendChild(div);
+  });
+}
+
+clickBtn.onclick = () => {
+  coins += clickPower;
+  if (Math.random() < 0.02) gems++;
+  updateUI();
+};
+
+createShop();
+updateUI();
+</script>
+</body>
+</html>
